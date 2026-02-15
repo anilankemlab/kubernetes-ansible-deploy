@@ -1,0 +1,52 @@
+name: Deploy Kubernetes Cluster
+
+on:
+
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'inventory/**'
+      - 'roles/**'
+      - 'playbooks/**'
+      - 'group_vars/**'
+      - 'ansible.cfg'
+
+jobs:
+
+  deploy:
+
+    name: Deploy Kubernetes
+
+    runs-on: self-hosted
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+
+    - name: Verify Ansible
+      run: ansible --version
+
+
+    - name: Test SSH connectivity
+      run: |
+        ansible all -m ping
+
+
+    - name: Deploy Kubernetes Cluster
+      run: |
+        ansible-playbook playbooks/site.yml
+
+
+    - name: Verify cluster nodes
+      run: |
+        ssh root@192.168.1.20 kubectl get nodes
+
+
+    - name: Verify MetalLB
+      run: |
+        ssh root@192.168.1.20 kubectl get pods -n metallb-system
