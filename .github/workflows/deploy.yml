@@ -39,6 +39,7 @@ jobs:
 
     - name: Deploy Kubernetes Cluster
       run: |
+        cd $GITHUB_WORKSPACE
         ansible-playbook playbooks/site.yml
 
 
