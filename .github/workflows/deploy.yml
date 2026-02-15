@@ -39,8 +39,7 @@ jobs:
 
     - name: Deploy Kubernetes Cluster
       run: |
-        cd $GITHUB_WORKSPACE
-        ansible-playbook playbooks/site.yml
+        ansible-playbook -i inventory/hosts.yml playbooks/site.yml
 
 
     - name: Verify cluster nodes
