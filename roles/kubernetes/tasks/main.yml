@@ -17,12 +17,19 @@
       - curl
       - gpg
     state: present
-    update_cache: yes
 
-- name: Download Kubernetes signing key
-  shell: |
-    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key | \
-    gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+- name: Download Kubernetes Release key
+  get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key
+    dest: /tmp/kubernetes-release.key
+
+- name: Convert key
+  command: >
+    gpg --dearmor
+    -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    /tmp/kubernetes-release.key
+  args:
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 - name: Add Kubernetes repo
   copy:
@@ -30,7 +37,7 @@
     content: |
       deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.35/deb/ /
 
-- name: Update apt cache after adding repo
+- name: Update apt cache
   apt:
     update_cache: yes
 
