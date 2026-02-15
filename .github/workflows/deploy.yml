@@ -31,7 +31,18 @@ jobs:
     - name: Verify Ansible
       run: ansible --version
 
+    - name: Fix SSh Known_Hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keygen -R 192.168.1.20 || true
+        ssh-keygen -R 192.168.1.21 || true
+        ssh-keygen -R 192.168.1.22 || true
 
+        ssh-keyscan -H 192.168.1.20 >> ~/.ssh/known_hosts
+        ssh-keyscan -H 192.168.1.21 >> ~/.ssh/known_hosts
+        ssh-keyscan -H 192.168.1.22 >> ~/.ssh/known_hosts  
+
+        
     - name: Test SSH connectivity
       run: |
         ansible all -m ping
