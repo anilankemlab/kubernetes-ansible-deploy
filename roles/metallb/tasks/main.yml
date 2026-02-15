@@ -17,8 +17,6 @@
   template:
     src: metallb-config.yml.j2
     dest: /tmp/metallb-config.yml
-  vars:
-    metallb_ip_range: "{{ metallb_ip_range | default('192.168.1.4-192.168.1.9') }}"
 
 - shell: kubectl apply -f /tmp/metallb-config.yml
   environment:
