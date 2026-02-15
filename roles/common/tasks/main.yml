@@ -1,3 +1,8 @@
+- name: Remove broken Kubernetes repo if exists
+  file:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    state: absent
+
 - name: Disable swap
   command: swapoff -a
 
