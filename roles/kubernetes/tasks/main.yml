@@ -1,3 +1,8 @@
+- name: Remove old kubernetes repo if exists
+  file:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    state: absent
+
 - name: Ensure keyrings directory exists
   file:
     path: /etc/apt/keyrings
@@ -18,20 +23,18 @@
   shell: |
     curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key | \
     gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-  args:
-    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-- name: Add Kubernetes apt repository
+- name: Add Kubernetes repo
   copy:
     dest: /etc/apt/sources.list.d/kubernetes.list
     content: |
       deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.35/deb/ /
 
-- name: Update apt cache
+- name: Update apt cache after adding repo
   apt:
     update_cache: yes
 
-- name: Install Kubernetes components
+- name: Install Kubernetes packages
   apt:
     name:
       - kubelet
@@ -39,16 +42,7 @@
       - kubectl
     state: present
 
-- name: Hold Kubernetes packages
-  dpkg_selections:
-    name: "{{ item }}"
-    selection: hold
-  loop:
-    - kubelet
-    - kubeadm
-    - kubectl
-
-- name: Enable kubelet service
+- name: Enable kubelet
   systemd:
     name: kubelet
     enabled: yes

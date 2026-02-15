@@ -29,4 +29,4 @@
       - gnupg
       - apt-transport-https
       - ca-certificates
-    update_cache: yes
+    state: present
