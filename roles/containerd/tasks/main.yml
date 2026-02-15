@@ -1,0 +1,21 @@
+- name: Install containerd
+  apt:
+    name: containerd
+    state: present
+
+- name: Configure containerd
+  shell: |
+    mkdir -p /etc/containerd
+    containerd config default > /etc/containerd/config.toml
+
+- name: Enable systemd cgroup
+  replace:
+    path: /etc/containerd/config.toml
+    regexp: 'SystemdCgroup = false'
+    replace: 'SystemdCgroup = true'
+
+- name: Restart containerd
+  systemd:
+    name: containerd
+    state: restarted
+    enabled: true

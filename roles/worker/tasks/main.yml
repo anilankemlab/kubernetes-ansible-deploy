@@ -1,0 +1,16 @@
+- name: Fetch join command
+  fetch:
+    src: /join-command.sh
+    dest: /tmp/join-command.sh
+    flat: yes
+  delegate_to: master
+
+- name: Copy join command
+  copy:
+    src: /tmp/join-command.sh
+    dest: /join-command.sh
+
+- name: Join cluster
+  command: sh /join-command.sh
+  args:
+    creates: /etc/kubernetes/kubelet.conf

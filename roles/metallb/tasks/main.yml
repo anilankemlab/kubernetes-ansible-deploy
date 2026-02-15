@@ -1,0 +1,23 @@
+- name: Install MetalLB
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Wait MetalLB ready
+  shell: |
+    kubectl wait --namespace metallb-system \
+    --for=condition=ready pod \
+    --selector=app=metallb \
+    --timeout=120s
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Apply MetalLB config
+  template:
+    src: metallb-config.yml.j2
+    dest: /tmp/metallb-config.yml
+
+- shell: kubectl apply -f /tmp/metallb-config.yml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

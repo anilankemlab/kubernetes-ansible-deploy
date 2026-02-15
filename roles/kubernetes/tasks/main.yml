@@ -1,0 +1,24 @@
+- name: Add Kubernetes key
+  shell: |
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | \
+    gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Add Kubernetes repo
+  copy:
+    dest: /etc/apt/sources.list.d/kubernetes.list
+    content: |
+      deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
+      https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+
+- name: Install Kubernetes packages
+  apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    update_cache: yes
+
+- name: Enable kubelet
+  systemd:
+    name: kubelet
+    enabled: true
